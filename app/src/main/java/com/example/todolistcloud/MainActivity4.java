@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MainActivity4 extends AppCompatActivity {
+/* test */
     EditText textName;
     EditText textEmail;
     EditText textPassword;
