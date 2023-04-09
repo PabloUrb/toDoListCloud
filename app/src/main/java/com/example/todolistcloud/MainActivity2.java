@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,7 +17,15 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.example.todolistcloud.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,6 +43,9 @@ public class MainActivity2 extends AppCompatActivity {
     static SharedPreferences sharedPref;
     public static JSONObject jsonTarea = new JSONObject();
 
+    private FirebaseFirestore db;
+    private DatabaseReference db1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,8 +56,27 @@ public class MainActivity2 extends AppCompatActivity {
         rvContacts.setAdapter(adapter);
         rvContacts.setLayoutManager(new LinearLayoutManager(this));
 
+        db = FirebaseFirestore.getInstance();
 
+        db.collection("tareas")
+                .whereEqualTo("user", db.document("users/"+MainActivity.userEmail))
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                System.out.println("SUCCESS");
+                                System.out.println("resultado :: "+document.getId() + " => " + document.getData());
+                            }
+                        } else {
+                            System.out.println("FAIL");
+                            System.out.println(task.getException());
+                        }
+                    }
+                });
         sharedPref = MainActivity2.this.getPreferences(Context.MODE_PRIVATE);
+        System.out.println("sharedPref :: "+sharedPref);
         String aux = sharedPref.getString("1", "");
         if(!aux.isEmpty()){
             try {
