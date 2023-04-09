@@ -27,6 +27,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -51,10 +52,7 @@ public class MainActivity2 extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
 
-        RecyclerView rvContacts = (RecyclerView) findViewById(R.id.tareas);
-        CustomAdapter adapter = new CustomAdapter(tareas);
-        rvContacts.setAdapter(adapter);
-        rvContacts.setLayoutManager(new LinearLayoutManager(this));
+
 
         db = FirebaseFirestore.getInstance();
 
@@ -68,6 +66,21 @@ public class MainActivity2 extends AppCompatActivity {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 System.out.println("SUCCESS");
                                 System.out.println("resultado :: "+document.getId() + " => " + document.getData());
+                                try {
+                                    JSONArray arr = new JSONArray("["+document.getData()+"]");
+                                    JSONObject jObj = arr.getJSONObject(0);
+                                    Tarea t = new Tarea();
+                                    System.out.println(jObj.getString("date"));
+                                    t.setDate(Date.valueOf(jObj.getString("date")));
+                                    t.setName(jObj.getString("name"));
+                                    t.setId(document.getId());
+                                    tareas.add(t);
+                                    jsonTarea.put(jObj.getString("name"), jObj.getString("date"));
+                                } catch (JSONException e) {
+                                    throw new RuntimeException(e);
+                                }
+                                System.out.println("tareas "+tareas);
+                                System.out.println(jsonTarea);
                             }
                         } else {
                             System.out.println("FAIL");
@@ -75,7 +88,12 @@ public class MainActivity2 extends AppCompatActivity {
                         }
                     }
                 });
-        sharedPref = MainActivity2.this.getPreferences(Context.MODE_PRIVATE);
+
+        RecyclerView rvContacts = (RecyclerView) findViewById(R.id.tareas);
+        CustomAdapter adapter = new CustomAdapter(tareas);
+        rvContacts.setAdapter(adapter);
+        rvContacts.setLayoutManager(new LinearLayoutManager(this));
+        /*sharedPref = MainActivity2.this.getPreferences(Context.MODE_PRIVATE);
         System.out.println("sharedPref :: "+sharedPref);
         String aux = sharedPref.getString("1", "");
         if(!aux.isEmpty()){
@@ -96,7 +114,7 @@ public class MainActivity2 extends AppCompatActivity {
                 throw new RuntimeException(e);
             }
         }
-
+*/
         switchToSecondActivity = (Button) findViewById(R.id.button);
         switchToSecondActivity.setOnClickListener(new View.OnClickListener() {
             @Override
