@@ -44,7 +44,7 @@ public class MainActivity2 extends AppCompatActivity {
     static SharedPreferences sharedPref;
     public static JSONObject jsonTarea = new JSONObject();
 
-    private FirebaseFirestore db;
+    public static FirebaseFirestore db;
     private DatabaseReference db1;
 
     @Override
@@ -54,40 +54,7 @@ public class MainActivity2 extends AppCompatActivity {
 
 
 
-        db = FirebaseFirestore.getInstance();
 
-        db.collection("tareas")
-                .whereEqualTo("user", db.document("users/"+MainActivity.userEmail))
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                System.out.println("SUCCESS");
-                                System.out.println("resultado :: "+document.getId() + " => " + document.getData());
-                                try {
-                                    JSONArray arr = new JSONArray("["+document.getData()+"]");
-                                    JSONObject jObj = arr.getJSONObject(0);
-                                    Tarea t = new Tarea();
-                                    System.out.println(jObj.getString("date"));
-                                    t.setDate(Date.valueOf(jObj.getString("date")));
-                                    t.setName(jObj.getString("name"));
-                                    t.setId(document.getId());
-                                    tareas.add(t);
-                                    jsonTarea.put(jObj.getString("name"), jObj.getString("date"));
-                                } catch (JSONException e) {
-                                    throw new RuntimeException(e);
-                                }
-                                System.out.println("tareas "+tareas);
-                                System.out.println(jsonTarea);
-                            }
-                        } else {
-                            System.out.println("FAIL");
-                            System.out.println(task.getException());
-                        }
-                    }
-                });
 
         RecyclerView rvContacts = (RecyclerView) findViewById(R.id.tareas);
         CustomAdapter adapter = new CustomAdapter(tareas);

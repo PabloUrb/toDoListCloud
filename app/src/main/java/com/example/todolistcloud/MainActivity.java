@@ -19,6 +19,17 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.sql.Date;
+
+import Objects.Tarea;
 
 public class MainActivity extends AppCompatActivity {
     public Button loginButton;
@@ -58,7 +69,42 @@ public class MainActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 System.out.println("SUCCESS");
                                 userEmail = email.replace(".","1");
-                                startActivity(new Intent(MainActivity.this, MainActivity2.class));
+                                MainActivity2.db = FirebaseFirestore.getInstance();
+
+                                MainActivity2.db.collection("tareas")
+                                        .whereEqualTo("user", MainActivity2.db.document("users/"+MainActivity.userEmail))
+                                        .get()
+                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                                        System.out.println("SUCCESS");
+                                                        System.out.println("resultado :: "+document.getId() + " => " + document.getData());
+                                                        try {
+                                                            JSONArray arr = new JSONArray("["+document.getData()+"]");
+                                                            JSONObject jObj = arr.getJSONObject(0);
+                                                            Tarea t = new Tarea();
+                                                            System.out.println(jObj.getString("date"));
+                                                            t.setDate(Date.valueOf(jObj.getString("date")));
+                                                            t.setName(jObj.getString("name"));
+                                                            t.setId(document.getId());
+                                                            MainActivity2.tareas.add(t);
+                                                            MainActivity2.jsonTarea.put(jObj.getString("name"), jObj.getString("date"));
+                                                        } catch (JSONException e) {
+                                                            throw new RuntimeException(e);
+                                                        }
+                                                        System.out.println("tareas "+MainActivity2.tareas);
+                                                        System.out.println(MainActivity2.jsonTarea);
+                                                        startActivity(new Intent(MainActivity.this, MainActivity2.class));
+                                                    }
+                                                } else {
+                                                    System.out.println("FAIL");
+                                                    System.out.println(task.getException());
+                                                }
+                                            }
+                                        });
+
                             } else {
                                 System.out.println("FAIL");
                                 Toast.makeText(MainActivity.this, "ALGO A FALLADO", Toast.LENGTH_SHORT).show();

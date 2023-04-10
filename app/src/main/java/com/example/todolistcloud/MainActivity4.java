@@ -81,6 +81,7 @@ public class MainActivity4 extends AppCompatActivity {
                                             System.out.println("snapshot.getCount() :: "+snapshot.getCount()+1);
                                             System.out.println("snapshot.getCount() :: "+snapshot.getCount()+1);
                                             String changedEmail = email.replace(".","1");
+
                                             db.collection("users").document(changedEmail).set(docData);
                                         } else {
                                             System.out.println("FAIL");
@@ -88,11 +89,8 @@ public class MainActivity4 extends AppCompatActivity {
                                     }
                                 });
 
-
-
-
                                 startActivity(new Intent(MainActivity4.this, MainActivity2.class));
-                                //db.collection("users").document(email).set(docData);
+
                             } else {
                                 System.out.println("FAIL");
                                 Toast.makeText(MainActivity4.this, "ALGO A FALLADO", Toast.LENGTH_SHORT).show();

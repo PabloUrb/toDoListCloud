@@ -101,7 +101,19 @@ public class MainActivity3 extends AppCompatActivity {
                                 docData.put("name", sUsername);
                                 docData.put("date", String.valueOf(date));
                                 docData.put("user", db.document("users/"+MainActivity.userEmail));
+                                Tarea t = new Tarea();
+                                System.out.println(date);
+                                t.setDate(Date.valueOf(String.valueOf(date)));
+                                t.setName(sUsername);
+                                t.setId(String.valueOf(snapshot.getCount()+1));
+                                MainActivity2.tareas.add(t);
+                                try {
+                                    MainActivity2.jsonTarea.put(sUsername, String.valueOf(date));
+                                } catch (JSONException e) {
+                                    throw new RuntimeException(e);
+                                }
                                 db.collection("tareas").document(String.valueOf(snapshot.getCount()+1)).set(docData);
+                                switchActivities();
                             } else {
                                 System.out.println("FAIL");
                             }
@@ -115,7 +127,7 @@ public class MainActivity3 extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                switchActivities();
+
             }
         });
 
