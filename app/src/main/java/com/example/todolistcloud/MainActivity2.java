@@ -103,6 +103,7 @@ public class MainActivity2 extends AppCompatActivity {
         public class ViewHolder extends RecyclerView.ViewHolder {
             private final TextView textView;
             private final TextView textView2;
+            private final TextView textView3;
             public Button imgViewRemoveIcon;
 
             public void removeSharedPreferences(String name){
@@ -125,13 +126,17 @@ public class MainActivity2 extends AppCompatActivity {
 
                 textView = (TextView) view.findViewById(R.id.textView);
                 textView2 = (TextView) view.findViewById(R.id.textView2);
+                textView3 = (TextView) view.findViewById(R.id.textView3);
                 imgViewRemoveIcon = (Button) view.findViewById(R.id.btnAddExpense);
                 imgViewRemoveIcon.setOnClickListener(new View.OnClickListener() {
 
                     @Override
                     public void onClick(View v) {
                         removeAt(getPosition());
-                        removeSharedPreferences(textView.getText().toString());
+                        db = FirebaseFirestore.getInstance();
+                        System.out.println("textView.getText().toString() :: "+textView3.getText().toString());
+                        db.collection("tareas").document(textView3.getText().toString()).delete();
+                        //removeSharedPreferences(textView.getText().toString());
                     }
                 });
             }
@@ -167,10 +172,11 @@ public class MainActivity2 extends AppCompatActivity {
             Tarea tarea = tareas.get(position);
             TextView textView = viewHolder.textView;
             TextView textView2 = viewHolder.textView2;
+            TextView textView3 = viewHolder.textView3;
             textView.setText(tarea.getName());
             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
             textView2.setText(formatter.format(tarea.getDate()));
-
+            textView3.setText(tarea.getId());
 
         }
 

@@ -88,12 +88,12 @@ public class MainActivity4 extends AppCompatActivity {
                                         }
                                     }
                                 });
-
+                                MainActivity.userEmail = email.replace(".", "1");
                                 startActivity(new Intent(MainActivity4.this, MainActivity2.class));
 
                             } else {
                                 System.out.println("FAIL");
-                                Toast.makeText(MainActivity4.this, "ALGO A FALLADO", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MainActivity4.this, "Ya existe un usuario con ese email", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
